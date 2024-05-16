@@ -2,6 +2,7 @@
 pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
+import "@openzeppelin/contracts/token/ERC721";
 import "@openzeppelin/contracts/utils/Strings.sol";
 import "@zk-email/contracts/DKIMRegistry.sol";
 import "@zk-email/contracts/utils/StringUtils.sol";
@@ -9,7 +10,7 @@ import "./utils/NFTSVG.sol";
 import { Verifier } from "./Verifier.sol";
 
 
-contract ProofOfTwitter is ERC721Enumerable {
+contract ProofOfTwitter is ERC721 {
     using StringUtils for *;
     using NFTSVG for *;
 
@@ -109,7 +110,18 @@ contract ProofOfTwitter is ERC721Enumerable {
         _mint(msg.sender, tokenId);
         tokenCounter = tokenCounter + 1;
     }
+     function transferFrom(
+        address from,
+        address to,
+        uint256 tokenId
+    ) public override(ERC721) {
+        require(
+            from == address(0),
+            "Cannot transfer - VerifiedEmail is soulbound"
+        );
 
+        super.transferFrom(from, to, tokenId);
+    }
     function _beforeTokenTransfer(
         address from,
         address to,

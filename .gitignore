@@ -61,7 +61,7 @@ circuits/regexes/subject_regex*
 *input.json
 *email_proof.json
 *.debug
-*.env
+
 .vscode
 
 .vite

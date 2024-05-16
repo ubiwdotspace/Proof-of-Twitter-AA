@@ -8,13 +8,8 @@ import "../src/ProofOfTwitter.sol";
 import "../src/Verifier.sol";
 
 contract Deploy is Script, Test {
-    function getPrivateKey() internal returns (uint256) {
-        try vm.envUint("PRIVATE_KEY") returns (uint256 privateKey) {
-            return privateKey;
-        } catch {
-            // This is the anvil default exposed secret key
-            return 0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80;
-        }
+    function getPrivateKey() internal pure returns (uint256) {
+        return 0x6b614893849a32b35ee26f3221d6569ed059b8997b3e547987d33ef6e7df9db6;
     }
 
     function run() public {

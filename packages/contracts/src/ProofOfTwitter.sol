@@ -2,7 +2,7 @@
 pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
-import "@openzeppelin/contracts/token/ERC721";
+import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 import "@zk-email/contracts/DKIMRegistry.sol";
 import "@zk-email/contracts/utils/StringUtils.sol";
@@ -27,6 +27,7 @@ contract ProofOfTwitter is ERC721 {
     Verifier public immutable verifier;
 
     mapping(uint256 => string) public tokenIDToName;
+    mapping(address => bool) public hasMinted; // Tracking addresses that have minted
 
     constructor(Verifier v, DKIMRegistry d) ERC721("VerifiedEmail", "VerifiedEmail") {
         verifier = v;
@@ -60,6 +61,8 @@ contract ProofOfTwitter is ERC721 {
     /// @param proof ZK proof of the circuit - a[2], b[4] and c[2] encoded in series
     /// @param signals Public signals of the circuit. First item is pubkey_hash, next 3 are twitter username, the last one is etherum address
     function mint(uint256[8] memory proof, uint256[3] memory signals) public {
+        require(!hasMinted[msg.sender], "Address has already minted a token"); // Ensure the address hasn't minted yet
+
         // TODO no invalid signal check yet, which is fine since the zk proof does it
         // Checks: Verify proof and check signals
         // require(signals[0] == 1337, "invalid signals");
@@ -109,8 +112,22 @@ contract ProofOfTwitter is ERC721 {
         tokenIDToName[tokenId] = messageBytes;
         _mint(msg.sender, tokenId);
         tokenCounter = tokenCounter + 1;
+        hasMinted[msg.sender] = true; // Mark the address as having minted
     }
-     function transferFrom(
+
+    function _beforeTokenTransfer(
+        address from,
+        address to,
+        uint256 tokenId
+    ) internal {
+        require(
+            from == address(0),
+            "Cannot transfer - VerifiedEmail is soulbound"
+        );
+    }
+   bool private _transferEnabled = false;
+
+      function transferFrom(
         address from,
         address to,
         uint256 tokenId
@@ -121,15 +138,5 @@ contract ProofOfTwitter is ERC721 {
         );
 
         super.transferFrom(from, to, tokenId);
-    }
-    function _beforeTokenTransfer(
-        address from,
-        address to,
-        uint256 tokenId
-    ) internal {
-        require(
-            from == address(0),
-            "Cannot transfer - VerifiedEmail is soulbound"
-        );
     }
 }

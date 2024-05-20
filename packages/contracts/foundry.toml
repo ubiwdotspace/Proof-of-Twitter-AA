@@ -5,3 +5,5 @@ libs = [ 'lib' ] # See more config options https://github.com/foundry-rs/foundry
 viaIR = true
 allow_paths = ['../../node_modules', '../../node_modules/@zk-email/contracts']
 solc_version = '0.8.21'
+[profile.remappings]
+openzeppelin-contracts = 'node_modules/@openzeppelin/contracts'

@@ -9,7 +9,7 @@ import "../src/Verifier.sol";
 
 contract Deploy is Script, Test {
     function getPrivateKey() internal pure returns (uint256) {
-        return 0x6b614893849a32b35ee26f3221d6569ed059b8997b3e547987d33ef6e7df9db6;
+        return 0x42e18f2a6a27d0dc33b88b2ab3bc2b2887ae66e1e10ec91c810730aac6406e48;
     }
 
     function run() public {

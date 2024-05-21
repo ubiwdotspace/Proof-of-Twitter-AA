@@ -37,7 +37,6 @@ const App = () => {
     <Router>
       <div>
         <NavSection />
-
         <Routes>
           <Route path="/" element={<MainPage />} />
           <Route element={<>Not found</>} />

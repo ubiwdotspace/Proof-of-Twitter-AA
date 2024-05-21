@@ -27,12 +27,14 @@ import { NumberedStep } from "../components/NumberedStep";
 import { TopBanner } from "../components/TopBanner";
 import { ProgressBar } from "../components/ProgressBar";
 
+import { EthereumSepolia } from "@particle-network/chains";
+
 const CIRCUIT_NAME = "twitter";
 
 export const MainPage: React.FC<{}> = (props) => {
   const { address } = useAccount();
 
-  const [ethereumAddress, setEthereumAddress] = useState<string>(address ?? "");
+  const [ethereumAddress, setEthereumAddress] = useState<string>("");
   const [emailFull, setEmailFull] = useState<string>(
     localStorage.emailFull || ""
   );
@@ -79,7 +81,26 @@ export const MainPage: React.FC<{}> = (props) => {
 
   useEffect(() => {
     if (address) {
-      setEthereumAddress(address);
+      const options = {
+        method: 'POST',
+        headers: {
+          accept: 'application/json',
+          'content-type': 'application/json',
+          authorization: 'Basic YzFiOTM3MjItY2RhYi00ZjUwLWIwM2UtOGE5OTdlZmIzYTJlOmNyUVk2SFVLSTAwRlBpNHV2c0ZZMjVwcXhtMGMzOTBIdWY5aDFWZDI='
+        },
+        body: JSON.stringify({
+          jsonrpc: 2, chainId: EthereumSepolia.id, id: 1, method: 'particle_aa_getSmartAccount', params: [{
+            name: "SIMPLE",
+            version: "1.0.0",
+            ownerAddress: address
+          }]
+        })
+      };
+
+      fetch('https://rpc.particle.network/evm-chain/#particle_aa_getSmartAccount', options)
+        .then(response => response.json())
+        .then(response => setEthereumAddress(response.result[0].smartAccountAddress))
+        .catch(err => console.error(err));
     } else {
       setEthereumAddress("");
     }
@@ -197,7 +218,7 @@ export const MainPage: React.FC<{}> = (props) => {
           Visit <a href="https://prove.email/blog/zkemail">our blog</a>{" "}or{" "}
           <a href="https://prove.email">website</a>{" "}to learn more about ZK Email,
           and find the technical details on how this demo is built{" "}
-          <a href="https://prove.email/blog/twitter">here</a>. 
+          <a href="https://prove.email/blog/twitter">here</a>.
           <br />
           <br />
           If you wish to generate a ZK proof of Twitter badge (NFT), you must:
@@ -230,7 +251,7 @@ export const MainPage: React.FC<{}> = (props) => {
         </NumberedStep>
         <NumberedStep step={5}>
           Click <b>"Prove"</b>. Note it is completely client side and{" "}
-          <a href="https://github.com/zkemail/proof-of-twitter/" target="_blank" rel="noreferrer">open source</a>, 
+          <a href="https://github.com/zkemail/proof-of-twitter/" target="_blank" rel="noreferrer">open source</a>,
           and no server ever sees your private information.
         </NumberedStep>
         <NumberedStep step={6}>
@@ -261,11 +282,9 @@ export const MainPage: React.FC<{}> = (props) => {
             }}
           />
           <SingleLineInput
-            label="Ethereum Address"
+            label="Ethereum Smart Account Address"
             value={ethereumAddress}
-            onChange={(e) => {
-              setEthereumAddress(e.currentTarget.value);
-            }}
+            onChange={(_) => { }}
           />
           <Button
             data-testid="prove-button"
@@ -275,15 +294,13 @@ export const MainPage: React.FC<{}> = (props) => {
               ethereumAddress.length === 0
             }
             onClick={async () => {
-              const emailBuffer = rawEmailToBuffer(emailFull); // Cleaned email as buffer
-              
+              const emailBuffer = rawEmailToBuffer(emailFull);
+
               let input: ITwitterCircuitInputs;
               try {
                 setDisplayMessage("Generating proof...");
                 setStatus("generating-input");
-
                 input = await generateTwitterVerifierCircuitInputs(emailBuffer, ethereumAddress);
-
                 console.log("Generated input:", JSON.stringify(input));
               } catch (e) {
                 console.log("Error generating input", e);
@@ -369,11 +386,11 @@ export const MainPage: React.FC<{}> = (props) => {
           </Button>
           {displayMessage ===
             "Downloading compressed proving files... (this may take a few minutes)" && (
-            <ProgressBar
-              width={downloadProgress * 10}
-              label={`${downloadProgress} / 10 items`}
-            />
-          )}
+              <ProgressBar
+                width={downloadProgress * 10}
+                label={`${downloadProgress} / 10 items`}
+              />
+            )}
           <ProcessStatus status={status}>
             {status !== "not-started" ? (
               <div>
@@ -404,8 +421,8 @@ export const MainPage: React.FC<{}> = (props) => {
             onChange={(e) => {
               setPublicSignals(e.currentTarget.value);
             }}
-            // warning={
-            // }
+          // warning={
+          // }
           />
           <Button
             disabled={emailFull.trim().length === 0 || proof.length === 0}
@@ -442,12 +459,12 @@ export const MainPage: React.FC<{}> = (props) => {
             {isSuccess
               ? "Successfully sent to chain!"
               : isLoading
-              ? "Confirm in wallet"
-              : !write
-              ? "Connect Wallet first, scroll to top!"
-              : verificationPassed
-              ? "Mint Twitter badge on-chain"
-              : "Verify first, before minting on-chain!"}
+                ? "Confirm in wallet"
+                : !write
+                  ? "Connect Wallet first, scroll to top!"
+                  : verificationPassed
+                    ? "Mint Twitter badge on-chain"
+                    : "Verify first, before minting on-chain!"}
           </Button>
           {isSuccess && (
             <div>

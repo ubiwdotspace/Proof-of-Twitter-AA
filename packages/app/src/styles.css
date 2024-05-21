@@ -55,6 +55,7 @@ code {
   from {
     transform: rotate(0deg);
   }
+
   to {
     transform: rotate(360deg);
   }
@@ -67,19 +68,19 @@ a {
 }
 
 
-.fields > div {
+.fields>div {
   display: flex;
   align-items: center;
   justify-content: space-between;
   margin-top: 40px;
 }
 
-.fields > div > label {
+.fields>div>label {
   width: 150px;
 }
 
-.fields > div > input,
-.fields > div > textarea {
+.fields>div>input,
+.fields>div>textarea {
   flex: 2;
 }
 
@@ -97,7 +98,16 @@ h1 {
   font-weight: 300;
   line-height: 1.1;
 }
+
 html {
   background: #171717 !important;
   color: #fff;
+}
+
+input:disabled {
+  opacity: 0.5;
+}
+
+input:disabled:hover {
+  border: 1px solid rgba(255, 255, 255, 0.4);
 }

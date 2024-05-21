@@ -15,7 +15,7 @@ export const SingleLineInput: React.FC<{
       >
         {label}
       </label>
-      <Input onChange={onChange} value={value} placeholder={label} />
+      <Input onChange={onChange} value={value} placeholder={label} disabled />
     </InputContainer>
   );
 };

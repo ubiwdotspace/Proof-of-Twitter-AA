@@ -6,12 +6,14 @@ import {
   Routes,
   Link,
 } from "react-router-dom";
-import { useLocation } from "react-use";
 import styled from "styled-components";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
+import { useAccount, useDisconnect } from "wagmi";
+import { Button } from "./components/Button";
 
 const NavSection = () => {
-  const { pathname } = useLocation();
+  const account = useAccount();
+  const Disconect = useDisconnect();
 
   return (
     <Nav>
@@ -26,7 +28,8 @@ const NavSection = () => {
         }}
       >
         <DocsLink href="https://prove.email/docs">Docs</DocsLink>
-        <ConnectButton />
+        {!account.address && <ConnectButton />}
+        {account.address && <Button onClick={() => { Disconect.disconnect() }}>Disconect</Button>}
       </div>
     </Nav>
   );

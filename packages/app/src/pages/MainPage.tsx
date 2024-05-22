@@ -140,7 +140,6 @@ export const MainPage: React.FC<{}> = (props) => {
     enabled: !!(proof && publicSignals),
     onError: (error: { message: any }) => {
       console.error(error.message);
-      // TODO: handle errors
     },
   });
 

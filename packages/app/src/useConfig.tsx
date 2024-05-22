@@ -31,7 +31,7 @@ function useConfig() {
         chainName: EthereumSepolia.name,
         chainId: EthereumSepolia.id,
         wallet: {
-            displayWalletEntry: false,
+            displayWalletEntry: true,
             supportChains: [sepolia],
             customStyle: {
                 evmSupportWalletConnect: true,

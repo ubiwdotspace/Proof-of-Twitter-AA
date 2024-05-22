@@ -12,8 +12,8 @@ import { useAccount, useDisconnect } from "wagmi";
 import { Button } from "./components/Button";
 
 const NavSection = () => {
-  const account = useAccount();
-  const Disconect = useDisconnect();
+  const account = useAccount()
+  const { disconnect } = useDisconnect()
 
   return (
     <Nav>
@@ -29,7 +29,7 @@ const NavSection = () => {
       >
         <DocsLink href="https://prove.email/docs">Docs</DocsLink>
         {!account.address && <ConnectButton />}
-        {account.address && <Button onClick={() => { Disconect.disconnect() }}>Disconect</Button>}
+        {account.address && <Button onClick={() => { disconnect() }}>Disconect</Button>}
       </div>
     </Nav>
   );

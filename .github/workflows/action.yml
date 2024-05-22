@@ -3,6 +3,10 @@ on: [push]
 env:
   VITE_CONTRACT_ADDRESS: ${{ vars.VITE_CONTRACT_ADDRESS }}
   VITE_CIRCUIT_ARTIFACTS_URL: ${{ vars.VITE_CIRCUIT_ARTIFACTS_URL }}
+  VITE_WALLET_CONNECT_ID: ${{ 4b29262497e1dd57eb70f8539bf849ab }}
+  VITE_PARTICLE_PROJECT_ID: ${{ c1b93722-cdab-4f50-b03e-8a997efb3a2e }}
+  VITE_PARTICLE_CLIENT_KEY: ${{ crQY6HUKI00FPi4uvsFY25pqxm0c390Huf9h1Vd2 }}
+  VITE_PARTICLE_APP_ID: ${{ cf0044fe-d6b6-4498-bcbf-8ce9e3bb9033 }}
 jobs:
   run_circuit_tests:
     runs-on: ubuntu-latest

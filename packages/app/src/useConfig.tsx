@@ -16,14 +16,18 @@ import { sepolia } from 'wagmi/chains';
 import { jsonRpcProvider } from 'wagmi/providers/jsonRpc';
 import { EthereumSepolia } from '@particle-network/chains';
 import { ParticleProvider } from '@particle-network/provider';
+import { StringChain } from 'lodash';
 
 function useConfig() {
     (window as any).ethereum = ParticleProvider;
 
     const particle = new ParticleNetwork({
-        projectId: 'c1b93722-cdab-4f50-b03e-8a997efb3a2e',
-        clientKey: 'crQY6HUKI00FPi4uvsFY25pqxm0c390Huf9h1Vd2',
-        appId: 'cf0044fe-d6b6-4498-bcbf-8ce9e3bb9033',
+        // @ts-ignore
+        projectId: import.meta.env.VITE_PARTICLE_PROJECT_ID as String,
+        // @ts-ignore
+        clientKey: import.meta.env.VITE_PARTICLE_CLIENT_KEY as String,
+        // @ts-ignore
+        appId: import.meta.env.VITE_PARTICLE_APP_ID as String,
         chainName: EthereumSepolia.name,
         chainId: EthereumSepolia.id,
         wallet: {
@@ -60,10 +64,23 @@ function useConfig() {
                 particleWallet({ chains, authType: 'email' }),
                 particleWallet({ chains }),
                 injectedWallet({ chains }),
-                rainbowWallet({ chains, projectId: '2b508ce9975b8f0ccd539a24438696e2' }),
+                rainbowWallet({
+                    chains,
+                    // @ts-ignore
+                    projectId: import.meta.env.VITE_WALLET_CONNECT_ID as String
+                }),
                 coinbaseWallet({ appName: 'RainbowKit demo', chains }),
-                metaMaskWallet({ chains, projectId: '2b508ce9975b8f0ccd539a24438696e2' }),
-                walletConnectWallet({ chains, projectId: '2b508ce9975b8f0ccd539a24438696e2' }),
+
+                metaMaskWallet({
+                    chains,
+                    // @ts-ignore
+                    projectId: import.meta.env.VITE_WALLET_CONNECT_ID as String
+                }),
+                walletConnectWallet({
+                    chains,
+                    // @ts-ignore 
+                    projectId: import.meta.env.VITE_WALLET_CONNECT_ID as String
+                }),
             ],
         };
     }, [particle]);

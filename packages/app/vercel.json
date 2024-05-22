@@ -4,11 +4,7 @@
         "src": "/\\.well-known/(.*)",
         "dest": "/.well-known/$1",
         "headers": { "Cache-Control": "no-cache" }
-      },
-      {
-        "src": "(.*)",
-        "dest": "/index.html"
       }
     ]
-  }
+}
   

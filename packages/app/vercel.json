@@ -1,6 +1,13 @@
 {
     "rewrites": [
       { "source": "/(.*)", "destination": "/index.html" }
+    ],
+    "routes": [
+      {
+        "src": "/\\.well-known/(.*)",
+        "dest": "/.well-known/$1",
+        "headers": { "Cache-Control": "no-cache" }
+      }
     ]
   }
   

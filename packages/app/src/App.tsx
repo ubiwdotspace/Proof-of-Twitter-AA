@@ -42,7 +42,7 @@ const App = () => {
         <NavSection />
         <Routes>
           <Route path="/" element={<MainPage />} />
-          <Route element={<>Not found</>} />
+          <Route path="*" element={<>Not found</>} />
         </Routes>
       </div>
     </Router>

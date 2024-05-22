@@ -1,10 +1,8 @@
 {
-    "routes": [
-      {
-        "src": "/\\.well-known/(.*)",
-        "dest": "/.well-known/$1",
-        "headers": { "Cache-Control": "no-cache" }
-      }
-    ]
+  "rewrites": [
+    {
+      "source": "/.well-known/walletconnect.txt",
+      "destination": "/.well-known/walletconnect.txt"
+    }
+  ]
 }
-  

@@ -405,10 +405,11 @@ export const MainPage: React.FC<{}> = (props) => {
         <Column>
           <SubHeader>Output</SubHeader>
           <LabeledTextArea
+            disabled
             label="Proof Output"
             value={proof}
-            onChange={(e) => {
-              setProof(e.currentTarget.value);
+            onChange={(_) => {
+              { }
             }}
             warning={verificationMessage}
             warningColor={verificationPassed ? "green" : "red"}
@@ -417,8 +418,8 @@ export const MainPage: React.FC<{}> = (props) => {
             label="..."
             value={publicSignals}
             secret
-            onChange={(e) => {
-              setPublicSignals(e.currentTarget.value);
+            onChange={(_) => {
+              { }
             }}
           // warning={
           // }

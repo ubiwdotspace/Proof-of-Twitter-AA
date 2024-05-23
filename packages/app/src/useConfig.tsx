@@ -70,7 +70,6 @@ function useConfig() {
                     projectId: import.meta.env.VITE_WALLET_CONNECT_ID as String
                 }),
                 coinbaseWallet({ appName: 'RainbowKit demo', chains }),
-
                 metaMaskWallet({
                     chains,
                     // @ts-ignore

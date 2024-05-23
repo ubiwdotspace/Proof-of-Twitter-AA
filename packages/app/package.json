@@ -97,12 +97,5 @@
       "jsdom-worker"
     ]
   },
-  "packageManager": "yarn@3.2.3",
-  "resolutions": {
-    "@walletconnect/core/events": "^3.3.0",
-    "@walletconnect/etherum-provider/events": "^3.3.0",
-    "@walletconnect/jsonrpc-ws-connection/events": "^3.3.0",
-    "@walletconnect/sign-client/events": "^3.3.0",
-    "@walletconnect/universal-provider/events": "^3.3.0"
-  }
+  "packageManager": "yarn@3.2.3"
 }

@@ -3,11 +3,9 @@ import React, { useEffect, useState } from "react";
 import { useMount, useUpdateEffect } from "react-use";
 import styled from "styled-components";
 import _ from "lodash";
-import { useAccount, useContractWrite, usePrepareContractWrite } from "wagmi";
 import {
   rawEmailToBuffer,
 } from "@zk-email/helpers/dist/input-helpers";
-import { verifyDKIMSignature, DKIMVerificationResult } from "@zk-email/helpers/dist/dkim";
 import {
   downloadProofFiles,
   generateProof,
@@ -26,11 +24,12 @@ import { Col, Row } from "../components/Layout";
 import { NumberedStep } from "../components/NumberedStep";
 import { TopBanner } from "../components/TopBanner";
 import { ProgressBar } from "../components/ProgressBar";
+import { useAccount } from "@particle-network/connectkit";
 
 const CIRCUIT_NAME = "twitter";
 
 export const MainPage: React.FC<{}> = (props) => {
-  const { address } = useAccount();
+  const address = useAccount();
 
   const [ethereumAddress, setEthereumAddress] = useState<string>(address ?? "");
   const [emailFull, setEmailFull] = useState<string>(
@@ -107,23 +106,23 @@ export const MainPage: React.FC<{}> = (props) => {
     ].flat();
   };
 
-  const { config } = usePrepareContractWrite({
-    // @ts-ignore
-    address: import.meta.env.VITE_CONTRACT_ADDRESS,
-    abi: abi,
-    functionName: "mint",
-    args: [
-      reformatProofForChain(proof),
-      publicSignals ? JSON.parse(publicSignals) : [],
-    ],
-    enabled: !!(proof && publicSignals),
-    onError: (error: { message: any }) => {
-      console.error(error.message);
-      // TODO: handle errors
-    },
-  });
+  // const { config } = usePrepareContractWrite({
+  //   // @ts-ignore
+  //   address: import.meta.env.VITE_CONTRACT_ADDRESS,
+  //   abi: abi,
+  //   functionName: "mint",
+  //   args: [
+  //     reformatProofForChain(proof),
+  //     publicSignals ? JSON.parse(publicSignals) : [],
+  //   ],
+  //   enabled: !!(proof && publicSignals),
+  //   onError: (error: { message: any }) => {
+  //     console.error(error.message);
+  //     // TODO: handle errors
+  //   },
+  // });
 
-  const { data, isLoading, isSuccess, write } = useContractWrite(config);
+  // const { data, isLoading, isSuccess, write } = useContractWrite(config);
 
   useMount(() => {
     function handleKeyDown() {
@@ -197,7 +196,7 @@ export const MainPage: React.FC<{}> = (props) => {
           Visit <a href="https://prove.email/blog/zkemail">our blog</a>{" "}or{" "}
           <a href="https://prove.email">website</a>{" "}to learn more about ZK Email,
           and find the technical details on how this demo is built{" "}
-          <a href="https://prove.email/blog/twitter">here</a>. 
+          <a href="https://prove.email/blog/twitter">here</a>.
           <br />
           <br />
           If you wish to generate a ZK proof of Twitter badge (NFT), you must:
@@ -230,7 +229,7 @@ export const MainPage: React.FC<{}> = (props) => {
         </NumberedStep>
         <NumberedStep step={5}>
           Click <b>"Prove"</b>. Note it is completely client side and{" "}
-          <a href="https://github.com/zkemail/proof-of-twitter/" target="_blank" rel="noreferrer">open source</a>, 
+          <a href="https://github.com/zkemail/proof-of-twitter/" target="_blank" rel="noreferrer">open source</a>,
           and no server ever sees your private information.
         </NumberedStep>
         <NumberedStep step={6}>
@@ -276,7 +275,7 @@ export const MainPage: React.FC<{}> = (props) => {
             }
             onClick={async () => {
               const emailBuffer = rawEmailToBuffer(emailFull); // Cleaned email as buffer
-              
+
               let input: ITwitterCircuitInputs;
               try {
                 setDisplayMessage("Generating proof...");
@@ -369,11 +368,11 @@ export const MainPage: React.FC<{}> = (props) => {
           </Button>
           {displayMessage ===
             "Downloading compressed proving files... (this may take a few minutes)" && (
-            <ProgressBar
-              width={downloadProgress * 10}
-              label={`${downloadProgress} / 10 items`}
-            />
-          )}
+              <ProgressBar
+                width={downloadProgress * 10}
+                label={`${downloadProgress} / 10 items`}
+              />
+            )}
           <ProcessStatus status={status}>
             {status !== "not-started" ? (
               <div>
@@ -404,8 +403,8 @@ export const MainPage: React.FC<{}> = (props) => {
             onChange={(e) => {
               setPublicSignals(e.currentTarget.value);
             }}
-            // warning={
-            // }
+          // warning={
+          // }
           />
           <Button
             disabled={emailFull.trim().length === 0 || proof.length === 0}
@@ -433,30 +432,30 @@ export const MainPage: React.FC<{}> = (props) => {
             Verify
           </Button>
           <Button
-            disabled={!verificationPassed || isLoading || isSuccess || !write}
+            // disabled={!verificationPassed || isLoading || isSuccess || !write}
             onClick={async () => {
               setStatus("sending-on-chain");
-              write?.();
+              // write?.();
             }}
           >
-            {isSuccess
+            {/* {isSuccess
               ? "Successfully sent to chain!"
               : isLoading
-              ? "Confirm in wallet"
-              : !write
-              ? "Connect Wallet first, scroll to top!"
-              : verificationPassed
-              ? "Mint Twitter badge on-chain"
-              : "Verify first, before minting on-chain!"}
+                ? "Confirm in wallet"
+                : !write
+                  ? "Connect Wallet first, scroll to top!"
+                  : verificationPassed
+                    ? "Mint Twitter badge on-chain"
+                    : "Verify first, before minting on-chain!"} */}
           </Button>
-          {isSuccess && (
+          {/* {isSuccess && (
             <div>
               Transaction:{" "}
               <a href={"https://sepolia.etherscan.io/tx/" + data?.hash}>
                 {data?.hash}
               </a>
             </div>
-          )}
+          )} */}
         </Column>
       </Main>
     </Container>

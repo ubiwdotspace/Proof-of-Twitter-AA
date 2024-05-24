@@ -1,5 +1,4 @@
 import react from "@vitejs/plugin-react";
-import tsconfig from "vite-tsconfig-paths";
 import "rollup-plugin-node-polyfills";
 import commonjs from 'vite-plugin-commonjs'
 
@@ -11,16 +10,18 @@ export default {
     port: 3000,
   },
   publicDir: "public",
-  plugins: [commonjs(), react(), tsconfig()],
+  plugins: [commonjs(), react()],
   resolve: {
     alias: {
       "node:buffer": "buffer",
       "node:stream": "stream-browserify",
+      "node:process" : "process",
+      "node:events" : "events",
       buffer: "buffer",
-      process: "rollup-plugin-node-polyfills/polyfills/process-es6",
+      process: "process",
       util: "rollup-plugin-node-polyfills/polyfills/util",
       sys: "util",
-      events: "rollup-plugin-node-polyfills/polyfills/events",
+      events: "events",
       stream: "stream-browserify",
       path: "rollup-plugin-node-polyfills/polyfills/path",
       querystring: "rollup-plugin-node-polyfills/polyfills/qs",

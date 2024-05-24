@@ -6,12 +6,14 @@ import {
   Routes,
   Link,
 } from "react-router-dom";
-import { useLocation } from "react-use";
 import styled from "styled-components";
-import { ConnectButton } from "@rainbow-me/rainbowkit";
+import { ConnectButton, useAccount, useConnectKit } from "@particle-network/connectkit";
+import '@particle-network/connectkit/dist/index.css';
+import { Button } from "./components/Button";
 
 const NavSection = () => {
-  const { pathname } = useLocation();
+  const account = useAccount();
+  const particle = useConnectKit();
 
   return (
     <Nav>
@@ -26,7 +28,14 @@ const NavSection = () => {
         }}
       >
         <DocsLink href="https://prove.email/docs">Docs</DocsLink>
-        <ConnectButton />
+        {!account && <ConnectButton />}
+        {
+          account &&
+          <Button onClick={() => { particle.disconnect() }}>
+            Disconect
+          </Button>
+        }
+
       </div>
     </Nav>
   );
@@ -35,12 +44,11 @@ const NavSection = () => {
 const App = () => {
   return (
     <Router>
-      <div>
+      <div className="h-screen">
         <NavSection />
-
         <Routes>
           <Route path="/" element={<MainPage />} />
-          <Route element={<>Not found</>} />
+          <Route path="*" element={<>Not found</>} />
         </Routes>
       </div>
     </Router>

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 // @ts-ignore
 import { useMount, useUpdateEffect } from "react-use";
 import styled from "styled-components";
@@ -24,12 +24,32 @@ import { Col, Row } from "../components/Layout";
 import { NumberedStep } from "../components/NumberedStep";
 import { TopBanner } from "../components/TopBanner";
 import { ProgressBar } from "../components/ProgressBar";
-import { useAccount } from "@particle-network/connectkit";
+import { useAccountInfo } from "@particle-network/connectkit";
+import { SmartAccount } from '@particle-network/aa';
+import { EthereumSepolia } from "@particle-network/chains";
 
 const CIRCUIT_NAME = "twitter";
 
 export const MainPage: React.FC<{}> = (props) => {
-  const address = useAccount();
+  const { particleProvider, account: address } = useAccountInfo()
+
+  const smartAccount = useMemo(() => {
+    return new SmartAccount(particleProvider as any, {
+      //@ts-ignore
+      projectId: import.meta.env.VITE_APP_PROJECT_ID,
+      //@ts-ignore
+      clientKey: import.meta.env.VITE_APP_CLIENT_KEY,
+      //@ts-ignore
+      appId: import.meta.env.VITE_APP_APP_ID,
+      aaOptions: {
+        simple: [{
+          chainId: EthereumSepolia.id,
+          version: '1.0.0',
+        }
+        ]
+      }
+    });
+  }, [particleProvider])
 
   const [ethereumAddress, setEthereumAddress] = useState<string>(address ?? "");
   const [emailFull, setEmailFull] = useState<string>(
@@ -76,9 +96,30 @@ export const MainPage: React.FC<{}> = (props) => {
     }
   }, []);
 
+
+
   useEffect(() => {
     if (address) {
-      setEthereumAddress(address);
+      const options = {
+        method: 'POST',
+        headers: {
+          accept: 'application/json',
+          'content-type': 'application/json',
+          authorization: 'Basic YzFiOTM3MjItY2RhYi00ZjUwLWIwM2UtOGE5OTdlZmIzYTJlOmNyUVk2SFVLSTAwRlBpNHV2c0ZZMjVwcXhtMGMzOTBIdWY5aDFWZDI='
+        },
+        body: JSON.stringify({
+          jsonrpc: 2, chainId: EthereumSepolia.id, id: 1, method: 'particle_aa_getSmartAccount', params: [{
+            name: "SIMPLE",
+            version: "1.0.0",
+            ownerAddress: address
+          }]
+        })
+      };
+
+      fetch('https://rpc.particle.network/evm-chain/#particle_aa_getSmartAccount', options)
+        .then(response => response.json())
+        .then(response => setEthereumAddress(response.result[0].smartAccountAddress))
+        .catch(err => console.error(err));
     } else {
       setEthereumAddress("");
     }
@@ -260,10 +301,11 @@ export const MainPage: React.FC<{}> = (props) => {
             }}
           />
           <SingleLineInput
-            label="Ethereum Address"
+            disabled
+            label="Ethereum SMA Address"
             value={ethereumAddress}
             onChange={(e) => {
-              setEthereumAddress(e.currentTarget.value);
+              // setEthereumAddress(e.currentTarget.value);
             }}
           />
           <Button
@@ -388,20 +430,22 @@ export const MainPage: React.FC<{}> = (props) => {
         <Column>
           <SubHeader>Output</SubHeader>
           <LabeledTextArea
+            disabled
             label="Proof Output"
             value={proof}
             onChange={(e) => {
-              setProof(e.currentTarget.value);
+              // setProof(e.currentTarget.value);
             }}
             warning={verificationMessage}
             warningColor={verificationPassed ? "green" : "red"}
           />
           <LabeledTextArea
-            label="..."
+            disabled
+            label="Public Signals"
             value={publicSignals}
             secret
             onChange={(e) => {
-              setPublicSignals(e.currentTarget.value);
+              // setPublicSignals(e.currentTarget.value);
             }}
           // warning={
           // }
@@ -432,6 +476,7 @@ export const MainPage: React.FC<{}> = (props) => {
             Verify
           </Button>
           <Button
+            disabled={!verificationPassed || !address}
             // disabled={!verificationPassed || isLoading || isSuccess || !write}
             onClick={async () => {
               setStatus("sending-on-chain");
@@ -447,6 +492,10 @@ export const MainPage: React.FC<{}> = (props) => {
                   : verificationPassed
                     ? "Mint Twitter badge on-chain"
                     : "Verify first, before minting on-chain!"} */}
+            {!address ? "Connect Wallet first, scroll to top!"
+              : verificationPassed
+                ? "Mint Twitter badge on-chain"
+                : "Verify first, before minting on-chain!"}
           </Button>
           {/* {isSuccess && (
             <div>

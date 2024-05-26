@@ -2,10 +2,11 @@ import styled from "styled-components";
 import { Col } from "./Layout";
 
 export const SingleLineInput: React.FC<{
+  disabled?: boolean;
   label: string;
   value: any;
   onChange: (e: any) => void;
-}> = ({ label, onChange, value }) => {
+}> = ({ label, onChange, value, disabled }) => {
   return (
     <InputContainer>
       <label
@@ -15,7 +16,7 @@ export const SingleLineInput: React.FC<{
       >
         {label}
       </label>
-      <Input onChange={onChange} value={value} placeholder={label} />
+      <Input onChange={onChange} value={value} placeholder={label} disabled={disabled} />
     </InputContainer>
   );
 };

@@ -7,9 +7,20 @@ import {
   Link,
 } from "react-router-dom";
 import styled from "styled-components";
-import { ConnectButton, useAccount, useConnectKit } from "@particle-network/connectkit";
+import { ConnectButton, useAccount, useConnectKit, useParticleConnect } from "@particle-network/connectkit";
 import '@particle-network/connectkit/dist/index.css';
 import { Button } from "./components/Button";
+import { Suspense } from "react";
+
+function generateRandomString(length: number) {
+  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  let result = '';
+  const charactersLength = characters.length;
+  for (let i = 0; i < length; i++) {
+    result += characters.charAt(Math.floor(Math.random() * charactersLength));
+  }
+  return result;
+}
 
 const NavSection = () => {
   const account = useAccount();
@@ -28,14 +39,18 @@ const NavSection = () => {
         }}
       >
         <DocsLink href="https://prove.email/docs">Docs</DocsLink>
-        {!account && <ConnectButton />}
+        {!account &&
+          <div key={generateRandomString(10)}>
+            <ConnectButton />
+          </div>}
         {
           account &&
-          <Button onClick={() => { particle.disconnect() }}>
-            Disconect
-          </Button>
+          <div key={generateRandomString(12)}>
+            <Button onClick={() => { particle.disconnect() }}>
+              Disconect
+            </Button>
+          </div>
         }
-
       </div>
     </Nav>
   );
@@ -43,15 +58,23 @@ const NavSection = () => {
 
 const App = () => {
   return (
+
     <Router>
       <div className="h-screen">
-        <NavSection />
+        <Suspense fallback="Hello" >
+          <NavSection />
+        </Suspense>
         <Routes>
-          <Route path="/" element={<MainPage />} />
+          <Route path="/" element={
+            <Suspense fallback="Loading" >
+              <MainPage />
+            </Suspense>
+          } />
           <Route path="*" element={<>Not found</>} />
         </Routes>
       </div>
     </Router>
+
   );
 };
 

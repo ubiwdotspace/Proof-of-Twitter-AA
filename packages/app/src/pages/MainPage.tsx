@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useReducer, useState } from "react";
 // @ts-ignore
 import { useMount, useUpdateEffect } from "react-use";
 import styled from "styled-components";
@@ -24,17 +24,21 @@ import { Col, Row } from "../components/Layout";
 import { NumberedStep } from "../components/NumberedStep";
 import { TopBanner } from "../components/TopBanner";
 import { ProgressBar } from "../components/ProgressBar";
-import { useAccountInfo } from "@particle-network/connectkit";
+import { useAccountInfo, useAccount } from "@particle-network/connectkit";
 import { SmartAccount } from '@particle-network/aa';
 import { EthereumSepolia } from "@particle-network/chains";
+import { Interface } from "ethers";
+import reducer, { SET_ERROR, SET_ETHERUM_ADDRESS, SET_LOADING, SET_TX_HASH, SET_EMAIL_FULL, SET_PROOF, SET_PUBLIC_SIGNALS } from "../hooks/store";
+import { EVMProvider } from "@particle-network/connectors";
 
 const CIRCUIT_NAME = "twitter";
 
 export const MainPage: React.FC<{}> = (props) => {
-  const { particleProvider, account: address } = useAccountInfo()
+  const address = useAccount();
+  const { particleProvider } = useAccountInfo()
 
   const smartAccount = useMemo(() => {
-    return new SmartAccount(particleProvider as any, {
+    return new SmartAccount(particleProvider as EVMProvider, {
       //@ts-ignore
       projectId: import.meta.env.VITE_APP_PROJECT_ID,
       //@ts-ignore
@@ -51,14 +55,18 @@ export const MainPage: React.FC<{}> = (props) => {
     });
   }, [particleProvider])
 
-  const [ethereumAddress, setEthereumAddress] = useState<string>(address ?? "");
-  const [emailFull, setEmailFull] = useState<string>(
-    localStorage.emailFull || ""
-  );
-  const [proof, setProof] = useState<string>(localStorage.proof || "");
-  const [publicSignals, setPublicSignals] = useState<string>(
-    localStorage.publicSignals || ""
-  );
+  const [state, dispatch] = useReducer(reducer, {
+    txHash: '',
+    error: '',
+    loading: false,
+    ethereumAddress: '',
+    emailFull: localStorage.emailFull || "",
+    proof: localStorage.proof || "",
+    publicSignals: localStorage.publicSignals || ""
+  });
+
+  const { txHash, error, loading, emailFull, ethereumAddress, proof, publicSignals } = state;
+
   const [displayMessage, setDisplayMessage] = useState<string>("Prove");
 
   const [verificationMessage, setVerificationMessage] = useState("");
@@ -96,32 +104,14 @@ export const MainPage: React.FC<{}> = (props) => {
     }
   }, []);
 
-
-
   useEffect(() => {
     if (address) {
-      const options = {
-        method: 'POST',
-        headers: {
-          accept: 'application/json',
-          'content-type': 'application/json',
-          authorization: 'Basic YzFiOTM3MjItY2RhYi00ZjUwLWIwM2UtOGE5OTdlZmIzYTJlOmNyUVk2SFVLSTAwRlBpNHV2c0ZZMjVwcXhtMGMzOTBIdWY5aDFWZDI='
-        },
-        body: JSON.stringify({
-          jsonrpc: 2, chainId: EthereumSepolia.id, id: 1, method: 'particle_aa_getSmartAccount', params: [{
-            name: "SIMPLE",
-            version: "1.0.0",
-            ownerAddress: address
-          }]
-        })
-      };
+      const fetchAccount = async () => {
+        const smaAddress = await smartAccount.getAddress()
+        dispatch({ type: SET_ETHERUM_ADDRESS, payload: smaAddress })
+      }
 
-      fetch('https://rpc.particle.network/evm-chain/#particle_aa_getSmartAccount', options)
-        .then(response => response.json())
-        .then(response => setEthereumAddress(response.result[0].smartAccountAddress))
-        .catch(err => console.error(err));
-    } else {
-      setEthereumAddress("");
+      fetchAccount()
     }
   }, [address]);
 
@@ -165,6 +155,38 @@ export const MainPage: React.FC<{}> = (props) => {
 
   // const { data, isLoading, isSuccess, write } = useContractWrite(config);
 
+  const mintNFT = async () => {
+    if (!(proof && publicSignals)) {
+      return
+    }
+
+    const callData = new Interface(abi).encodeFunctionData("mint", [reformatProofForChain(proof), publicSignals ? JSON.parse(publicSignals) : []])
+
+    const tx = {
+      //@ts-ignore
+      to: import.meta.env.VITE_CONTRACT_ADDRESS,
+      data: callData,
+    }
+
+    dispatch({ type: SET_ERROR, payload: '' });
+    dispatch({ type: SET_LOADING, payload: true });
+
+    try {
+      const feeQuotesResult = await smartAccount.getFeeQuotes(tx);
+      const userOp = feeQuotesResult.verifyingPaymasterNative.userOp;
+      const userOpHash = feeQuotesResult.verifyingPaymasterNative.userOpHash;
+      await smartAccount.sendUserOperation({ userOp, userOpHash });
+      const txHash = await smartAccount.sendTransaction({ tx });
+      dispatch({ type: SET_TX_HASH, payload: txHash });
+      dispatch({ type: SET_LOADING, payload: false });
+
+    }
+    catch (e: any) {
+      dispatch({ type: SET_ERROR, payload: e?.data?.extraMessage?.message as string || e.message as string });
+      dispatch({ type: SET_LOADING, payload: false });
+    }
+  }
+
   useMount(() => {
     function handleKeyDown() {
       setLastAction("");
@@ -199,7 +221,7 @@ export const MainPage: React.FC<{}> = (props) => {
   const onFileDrop = async (file: File) => {
     if (file.name.endsWith(".eml")) {
       const content = await file.text();
-      setEmailFull(content);
+      dispatch({ type: SET_EMAIL_FULL, payload: content })
     } else {
       alert("Only .eml files are allowed.");
     }
@@ -297,7 +319,7 @@ export const MainPage: React.FC<{}> = (props) => {
             label="Full Email with Headers"
             value={emailFull}
             onChange={(e) => {
-              setEmailFull(e.currentTarget.value);
+              dispatch({ type: SET_EMAIL_FULL, payload: e.currentTarget.value })
             }}
           />
           <SingleLineInput
@@ -381,13 +403,13 @@ export const MainPage: React.FC<{}> = (props) => {
               console.log("publicSignals", publicSignals);
 
               // alert("Done generating proof");
-              setProof(JSON.stringify(proof));
+              dispatch({ type: SET_PROOF, payload: JSON.stringify(proof) })
               // let kek = publicSignals.map((x: string) => BigInt(x));
               // let soln = packedNBytesToString(kek.slice(0, 12));
               // let soln2 = packedNBytesToString(kek.slice(12, 147));
               // let soln3 = packedNBytesToString(kek.slice(147, 150));
               // setPublicSignals(`From: ${soln}\nTo: ${soln2}\nUsername: ${soln3}`);
-              setPublicSignals(JSON.stringify(publicSignals));
+              dispatch({ type: SET_PUBLIC_SIGNALS, payload: JSON.stringify(publicSignals) })
 
               if (!input) {
                 setStatus("error-failed-to-prove");
@@ -476,11 +498,11 @@ export const MainPage: React.FC<{}> = (props) => {
             Verify
           </Button>
           <Button
-            disabled={!verificationPassed || !address}
+            disabled={!verificationPassed || !address || loading}
             // disabled={!verificationPassed || isLoading || isSuccess || !write}
             onClick={async () => {
               setStatus("sending-on-chain");
-              // write?.();
+              mintNFT()
             }}
           >
             {/* {isSuccess
@@ -492,19 +514,26 @@ export const MainPage: React.FC<{}> = (props) => {
                   : verificationPassed
                     ? "Mint Twitter badge on-chain"
                     : "Verify first, before minting on-chain!"} */}
-            {!address ? "Connect Wallet first, scroll to top!"
+            {loading ? "Confirm in Wallet" : !address ? "Connect Wallet first, scroll to top!"
               : verificationPassed
                 ? "Mint Twitter badge on-chain"
                 : "Verify first, before minting on-chain!"}
           </Button>
-          {/* {isSuccess && (
+          {txHash && (
             <div>
               Transaction:{" "}
-              <a href={"https://sepolia.etherscan.io/tx/" + data?.hash}>
-                {data?.hash}
+              <a href={"https://sepolia.etherscan.io/tx/" + txHash}>
+                {txHash}
               </a>
             </div>
-          )} */}
+          )}
+
+          {
+            error &&
+            <div style={{ color: 'red' }}>
+              {error}
+            </div>
+          }
         </Column>
       </Main>
     </Container>

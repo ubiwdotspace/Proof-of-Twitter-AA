@@ -15,9 +15,6 @@ export default {
     alias: {
       "node:buffer": "buffer",
       "node:stream": "stream-browserify",
-      "node:events" : "events",
-      "node:ethers" : "ethers",
-      ethers: "ethers",
       buffer: "buffer",
       process: "process",
       util: "rollup-plugin-node-polyfills/polyfills/util",

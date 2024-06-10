@@ -3726,6 +3726,19 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@particle-network/auth@npm:>=1.2.2, @particle-network/auth@npm:^1.3.1":
+  version: 1.3.1
+  resolution: "@particle-network/auth@npm:1.3.1"
+  dependencies:
+    "@particle-network/analytics": ^1.0.1
+    "@particle-network/chains": "*"
+    "@particle-network/crypto": ^1.0.1
+    buffer: ^6.0.3
+    draggabilly: ^3.0.0
+  checksum: 3c136df9e5514ac31be2fd28a3c12f2b5dbad389ff710a3356c70bd824b2273097e1c0b306e5ea9dd092557da4af17373a47b337279a08a29cca0a6f857b86b1
+  languageName: node
+  linkType: hard
+
 "@particle-network/chains@npm:*, @particle-network/chains@npm:>=1.3.8, @particle-network/chains@npm:latest":
   version: 1.4.10
   resolution: "@particle-network/chains@npm:1.4.10"
@@ -3733,30 +3746,93 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@particle-network/connectkit@npm:^1.3.3":
-  version: 1.4.3
-  resolution: "@particle-network/connectkit@npm:1.4.3"
+"@particle-network/connect-react-ui@npm:^1.2.1":
+  version: 1.2.1
+  resolution: "@particle-network/connect-react-ui@npm:1.2.1"
   dependencies:
-    "@particle-network/auth-core-modal": ^1.4.6
-    "@particle-network/connectors": ^1.4.1
+    "@particle-network/connect": ^1.2.1
     i18next: ^22.0.6
     qrcode: ^1.5.1
     react-i18next: ^12.0.0
     react-svg: ^16.1.6
-  checksum: 9a531b4ab5d3fb4f160af6778c00445a62d626bb1b7bcc4c0c1a5957b85684e965ba4f1222f46e2b55297ce15cd77b3e4fdedb988c57587934c5e6f8fc5935e2
+  checksum: b38ed4b2ccf519b4024aded55b0be838df45484fe88c3ddf5441f711ba9b020d2852c7644cb47af4eac3dc2e08338f433fc45136bf31c65c8a9f44dd209d4688
   languageName: node
   linkType: hard
 
-"@particle-network/connectors@npm:^1.3.1, @particle-network/connectors@npm:^1.4.1":
-  version: 1.4.1
-  resolution: "@particle-network/connectors@npm:1.4.1"
+"@particle-network/connect@npm:^1.2.1":
+  version: 1.2.1
+  resolution: "@particle-network/connect@npm:1.2.1"
+  dependencies:
+    "@coinbase/wallet-sdk": ^3.7.1
+    "@particle-network/auth": ">=1.2.2"
+    "@particle-network/provider": ">=1.2.1"
+    "@particle-network/solana-wallet": ">=1.2.1"
+    "@walletconnect/ethereum-provider": ~2.9.1
+    "@walletconnect/modal": ~2.6.0
+    eventemitter3: ^4.0.0
+  checksum: 3779e608b81f282241363c7f527306112c6960ed3c8fbb66fadb4be831ae2f83aaadd0eb162ebe1f0180689cdc28c53b7208db7617dcced454f46ef64f52e9f8
+  languageName: node
+  linkType: hard
+
+"@particle-network/connectkit@npm:latest":
+  version: 1.4.5
+  resolution: "@particle-network/connectkit@npm:1.4.5"
+  dependencies:
+    "@particle-network/auth-core-modal": ^1.4.6
+    "@particle-network/connectors": ^1.4.3
+    i18next: ^22.0.6
+    qrcode: ^1.5.1
+    react-i18next: ^12.0.0
+    react-svg: ^16.1.6
+  checksum: 66273fae80bbe790a89f1d6db285c1c77acfd996664a30207646ae4daa042937f208269ea736a9c0ca611a22e9f350a60f131c6bfedd2befe6a28dac52888317
+  languageName: node
+  linkType: hard
+
+"@particle-network/connectors@npm:^1.4.3, @particle-network/connectors@npm:latest":
+  version: 1.4.3
+  resolution: "@particle-network/connectors@npm:1.4.3"
   dependencies:
     "@coinbase/wallet-sdk": ^3.7.1
     "@particle-network/chains": "*"
     "@walletconnect/ethereum-provider": ~2.10.6
     "@walletconnect/modal": ~2.6.2
     eventemitter3: ^4.0.0
-  checksum: f6b3fcf4428f37cd75cee5e854b560f0fb62f11dd8c18d9e7c02afdcd81beda61afc4884ff9f20ca89d12f368c8bb90831f9a87cf46a56c654d59c5e5e8a4ace
+  checksum: c86f2ff37c1ffd62e79ca1d4fc19587c04aa17e7848ed8d364c1ed61ba995d06d1aca8c9f5beb4be2ffb7471c349bb447e6f9bfe872f1b416648fff3bc06a71f
+  languageName: node
+  linkType: hard
+
+"@particle-network/crypto@npm:^1.0.1":
+  version: 1.0.1
+  resolution: "@particle-network/crypto@npm:1.0.1"
+  dependencies:
+    crypto-js: ^4.1.1
+    uuidv4: ^6.2.13
+  checksum: 45d871848119923c20c7b7fff4eb995c6f654ab9146b50dd915b83db5fdce05c2179fb7f24d64f2083a3cde2f1926ba37bf217483806ef296f0914a64c9c78a9
+  languageName: node
+  linkType: hard
+
+"@particle-network/provider@npm:>=1.2.1":
+  version: 1.3.2
+  resolution: "@particle-network/provider@npm:1.3.2"
+  dependencies:
+    "@particle-network/chains": "*"
+    axios: ^1.3.6
+    uuid: ^8.3.2
+  peerDependencies:
+    "@particle-network/auth": "*"
+  checksum: cacaadfe433b8eabd8be479e62316fd58e9af175d9294a260e12f2b1d3b07de6b010ea7158631a5f1f8b83bb02f7997caa5b0cd9dd2c3aab0d94fa35ed2c8086
+  languageName: node
+  linkType: hard
+
+"@particle-network/solana-wallet@npm:>=1.2.1":
+  version: 1.3.2
+  resolution: "@particle-network/solana-wallet@npm:1.3.2"
+  dependencies:
+    "@particle-network/auth": ^1.3.1
+  peerDependencies:
+    "@solana/web3.js": ^1.50.1
+    bs58: ^4.0.1
+  checksum: 5571f926e41684eeb11380d8b89e6fb39cf74bcb118edbf8180281a548d78b4a457479c643fa03b3ec0fe79efcdf438c03fe7a7bd3f8793c4e1a3496d6bcdedd
   languageName: node
   linkType: hard
 
@@ -5268,6 +5344,30 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@walletconnect/core@npm:2.9.2":
+  version: 2.9.2
+  resolution: "@walletconnect/core@npm:2.9.2"
+  dependencies:
+    "@walletconnect/heartbeat": 1.2.1
+    "@walletconnect/jsonrpc-provider": 1.0.13
+    "@walletconnect/jsonrpc-types": 1.0.3
+    "@walletconnect/jsonrpc-utils": 1.0.8
+    "@walletconnect/jsonrpc-ws-connection": 1.0.13
+    "@walletconnect/keyvaluestorage": ^1.0.2
+    "@walletconnect/logger": ^2.0.1
+    "@walletconnect/relay-api": ^1.0.9
+    "@walletconnect/relay-auth": ^1.0.4
+    "@walletconnect/safe-json": ^1.0.2
+    "@walletconnect/time": ^1.0.2
+    "@walletconnect/types": 2.9.2
+    "@walletconnect/utils": 2.9.2
+    events: ^3.3.0
+    lodash.isequal: 4.5.0
+    uint8arrays: ^3.1.0
+  checksum: f96fe5147ddae5ab08c72e946ebfc40b218ca2a985e243ebcbf2346c79286b33de9c1f6dfb0f9cb81ae52f29725b3437a8af8b856ed55ed3a089e06546b3db06
+  languageName: node
+  linkType: hard
+
 "@walletconnect/environment@npm:^1.0.1":
   version: 1.0.1
   resolution: "@walletconnect/environment@npm:1.0.1"
@@ -5292,6 +5392,28 @@ __metadata:
     "@walletconnect/utils": 2.10.6
     events: ^3.3.0
   checksum: 02452044400ef751358598aada659ce77ae69495f3b01f040a6888289d74d22a03c1736a4860a9e1157bc0211bbcde1e3b0eb01d4ff209c2bf14efe7172774c9
+  languageName: node
+  linkType: hard
+
+"@walletconnect/ethereum-provider@npm:~2.9.1":
+  version: 2.9.2
+  resolution: "@walletconnect/ethereum-provider@npm:2.9.2"
+  dependencies:
+    "@walletconnect/jsonrpc-http-connection": ^1.0.7
+    "@walletconnect/jsonrpc-provider": ^1.0.13
+    "@walletconnect/jsonrpc-types": ^1.0.3
+    "@walletconnect/jsonrpc-utils": ^1.0.8
+    "@walletconnect/sign-client": 2.9.2
+    "@walletconnect/types": 2.9.2
+    "@walletconnect/universal-provider": 2.9.2
+    "@walletconnect/utils": 2.9.2
+    events: ^3.3.0
+  peerDependencies:
+    "@walletconnect/modal": ">=2"
+  peerDependenciesMeta:
+    "@walletconnect/modal":
+      optional: true
+  checksum: 80cb896c5da6247b68a28ef08e5a8a32beb3e6a2b70a3543aaced09a618e73b5437af36f9884003333021566405e19938726f1f02241aa69f83f5a0df5a4150a
   languageName: node
   linkType: hard
 
@@ -5360,6 +5482,19 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@walletconnect/jsonrpc-ws-connection@npm:1.0.13":
+  version: 1.0.13
+  resolution: "@walletconnect/jsonrpc-ws-connection@npm:1.0.13"
+  dependencies:
+    "@walletconnect/jsonrpc-utils": ^1.0.6
+    "@walletconnect/safe-json": ^1.0.2
+    events: ^3.3.0
+    tslib: 1.14.1
+    ws: ^7.5.1
+  checksum: f2253b17564f7622e69b1252830f05efdf7f4d58b120adb3a3e950c2087845171c912307c39948d0b869aa8610688b83f54f54de4657091f7431aea95a59f8b9
+  languageName: node
+  linkType: hard
+
 "@walletconnect/jsonrpc-ws-connection@npm:1.0.14":
   version: 1.0.14
   resolution: "@walletconnect/jsonrpc-ws-connection@npm:1.0.14"
@@ -5372,7 +5507,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@walletconnect/keyvaluestorage@npm:^1.1.1":
+"@walletconnect/keyvaluestorage@npm:^1.0.2, @walletconnect/keyvaluestorage@npm:^1.1.1":
   version: 1.1.1
   resolution: "@walletconnect/keyvaluestorage@npm:1.1.1"
   dependencies:
@@ -5419,7 +5554,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@walletconnect/modal@npm:^2.4.3, @walletconnect/modal@npm:~2.6.2":
+"@walletconnect/modal@npm:^2.4.3, @walletconnect/modal@npm:~2.6.0, @walletconnect/modal@npm:~2.6.2":
   version: 2.6.2
   resolution: "@walletconnect/modal@npm:2.6.2"
   dependencies:
@@ -5479,6 +5614,23 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@walletconnect/sign-client@npm:2.9.2":
+  version: 2.9.2
+  resolution: "@walletconnect/sign-client@npm:2.9.2"
+  dependencies:
+    "@walletconnect/core": 2.9.2
+    "@walletconnect/events": ^1.0.1
+    "@walletconnect/heartbeat": 1.2.1
+    "@walletconnect/jsonrpc-utils": 1.0.8
+    "@walletconnect/logger": ^2.0.1
+    "@walletconnect/time": ^1.0.2
+    "@walletconnect/types": 2.9.2
+    "@walletconnect/utils": 2.9.2
+    events: ^3.3.0
+  checksum: b91b271130ab6404c89a94e31bcf9b987c23bc4c5f86a75344b7f4ea1cd887996ae7876038ae35b430175af17529c4caf9bc332abe6e986d878439c7a3dba31a
+  languageName: node
+  linkType: hard
+
 "@walletconnect/time@npm:^1.0.2":
   version: 1.0.2
   resolution: "@walletconnect/time@npm:1.0.2"
@@ -5502,6 +5654,20 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@walletconnect/types@npm:2.9.2":
+  version: 2.9.2
+  resolution: "@walletconnect/types@npm:2.9.2"
+  dependencies:
+    "@walletconnect/events": ^1.0.1
+    "@walletconnect/heartbeat": 1.2.1
+    "@walletconnect/jsonrpc-types": 1.0.3
+    "@walletconnect/keyvaluestorage": ^1.0.2
+    "@walletconnect/logger": ^2.0.1
+    events: ^3.3.0
+  checksum: 81d523cf337f456190b87242ae7843e09f0b1d84127c1138d73420a5cc8e7b05f7f1722dfeaa2ecd12be25331e3896c733e0327221bc51eb6bae192e43b4a99f
+  languageName: node
+  linkType: hard
+
 "@walletconnect/universal-provider@npm:2.10.6":
   version: 2.10.6
   resolution: "@walletconnect/universal-provider@npm:2.10.6"
@@ -5516,6 +5682,23 @@ __metadata:
     "@walletconnect/utils": 2.10.6
     events: ^3.3.0
   checksum: c09fd28819389d990edafb261d0570d54527f0872dd3c2ac38ac0c6fc25905dc2248809fc4fea2de382b2f68c86eee8e1d192fb46402bcc49370d76959662436
+  languageName: node
+  linkType: hard
+
+"@walletconnect/universal-provider@npm:2.9.2":
+  version: 2.9.2
+  resolution: "@walletconnect/universal-provider@npm:2.9.2"
+  dependencies:
+    "@walletconnect/jsonrpc-http-connection": ^1.0.7
+    "@walletconnect/jsonrpc-provider": 1.0.13
+    "@walletconnect/jsonrpc-types": ^1.0.2
+    "@walletconnect/jsonrpc-utils": ^1.0.7
+    "@walletconnect/logger": ^2.0.1
+    "@walletconnect/sign-client": 2.9.2
+    "@walletconnect/types": 2.9.2
+    "@walletconnect/utils": 2.9.2
+    events: ^3.3.0
+  checksum: 4f1003d63e5358fb45b15c1156911cda8287c98d606084c6168bda5fa9b9a376a3d08afc777823b9dfb71dad18c3f90896be0c0c7d5fc56c6061086b91177bc7
   languageName: node
   linkType: hard
 
@@ -5538,6 +5721,28 @@ __metadata:
     query-string: 7.1.3
     uint8arrays: ^3.1.0
   checksum: f6543601897aaa00f7aa0178df1cb88cca8f06f65846d3f4be85c458e79d04c462ad45e1f38d3fc993fcfa4f77871c92308e81620d6256da8138ae10e4b7546c
+  languageName: node
+  linkType: hard
+
+"@walletconnect/utils@npm:2.9.2":
+  version: 2.9.2
+  resolution: "@walletconnect/utils@npm:2.9.2"
+  dependencies:
+    "@stablelib/chacha20poly1305": 1.0.1
+    "@stablelib/hkdf": 1.0.1
+    "@stablelib/random": ^1.0.2
+    "@stablelib/sha256": 1.0.1
+    "@stablelib/x25519": ^1.0.3
+    "@walletconnect/relay-api": ^1.0.9
+    "@walletconnect/safe-json": ^1.0.2
+    "@walletconnect/time": ^1.0.2
+    "@walletconnect/types": 2.9.2
+    "@walletconnect/window-getters": ^1.0.1
+    "@walletconnect/window-metadata": ^1.0.1
+    detect-browser: 5.3.0
+    query-string: 7.1.3
+    uint8arrays: ^3.1.0
+  checksum: 9caf05fa6f7c95945e675845e305220fc1e7832ae595a9ff39799195d2d5865972914f74a8768044473f45450e98db685a0ff965a09d9cd0220cfdc391279eab
   languageName: node
   linkType: hard
 
@@ -5627,8 +5832,9 @@ __metadata:
     "@esbuild-plugins/node-modules-polyfill": ^0.2.2
     "@particle-network/aa": 1.2.0
     "@particle-network/chains": latest
-    "@particle-network/connectkit": ^1.3.3
-    "@particle-network/connectors": ^1.3.1
+    "@particle-network/connect-react-ui": ^1.2.1
+    "@particle-network/connectkit": latest
+    "@particle-network/connectors": latest
     "@proof-of-twitter/circuits": "workspace:^"
     "@proof-of-twitter/contracts": "workspace:^"
     "@testing-library/jest-dom": ^5.16.3

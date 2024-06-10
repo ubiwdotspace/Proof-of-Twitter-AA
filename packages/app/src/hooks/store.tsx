@@ -1,7 +1,7 @@
 export const SET_TX_HASH = 'SET_TX_HASH';
 export const SET_ERROR = 'SET_ERROR';
 export const SET_LOADING = 'SET_LOADING';
-export const SET_ETHERUM_ADDRESS = 'SET_ETHERUM_ADDRESS';
+export const SET_ETHERUM_SMAADDRESS = 'SET_ETHERUM_ADDRESS';
 export const SET_EMAIL_FULL = 'SET_EMAIL_FULL'
 export const SET_PROOF = 'SET_PROOF'
 export const SET_PUBLIC_SIGNALS = 'SET_PUBLIC_SIGNALS'
@@ -11,7 +11,7 @@ interface State {
     txHash: string;
     error: string;
     loading: boolean;
-    ethereumAddress: string;
+    ethereumSMAAddress: string;
     emailFull: string;
     proof: string;
     publicSignals: string
@@ -22,7 +22,7 @@ type Action =
     | { type: typeof SET_TX_HASH; payload: string }
     | { type: typeof SET_ERROR; payload: string }
     | { type: typeof SET_LOADING; payload: boolean }
-    | { type: typeof SET_ETHERUM_ADDRESS, payload: string }
+    | { type: typeof SET_ETHERUM_SMAADDRESS, payload: string }
     | { type: typeof SET_EMAIL_FULL, payload: string }
     | { type: typeof SET_PROOF, payload: string }
     | { type: typeof SET_PUBLIC_SIGNALS, payload: string };
@@ -45,10 +45,10 @@ const reducer = (state: State, action: Action): State => {
                 ...state,
                 loading: action.payload,
             };
-        case SET_ETHERUM_ADDRESS:
+        case SET_ETHERUM_SMAADDRESS:
             return {
                 ...state,
-                ethereumAddress: action.payload,
+                ethereumSMAAddress: action.payload,
             }
         case SET_EMAIL_FULL:
             return {

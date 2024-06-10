@@ -7,10 +7,10 @@ import {
   Link,
 } from "react-router-dom";
 import styled from "styled-components";
-import { ConnectButton, useAccount, useConnectKit, useParticleConnect } from "@particle-network/connectkit";
 import '@particle-network/connectkit/dist/index.css';
 import { Button } from "./components/Button";
-import { Suspense } from "react";
+import { Suspense, useState } from "react";
+import { ConnectButton, useConnectKit, useAccount } from '@particle-network/connect-react-ui';
 
 function generateRandomString(length: number) {
   const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
@@ -22,7 +22,8 @@ function generateRandomString(length: number) {
   return result;
 }
 
-const NavSection = () => {
+
+const NavSection = ({ balanceState }: { balanceState: any }) => {
   const account = useAccount();
   const particle = useConnectKit();
 
@@ -45,11 +46,12 @@ const NavSection = () => {
           </div>}
         {
           account &&
-          <div key={generateRandomString(12)}>
+          <Flex key={generateRandomString(12)}>
+            <Price>{balanceState[0] + ' ETH'} </Price>
             <Button onClick={() => { particle.disconnect() }}>
               Disconect
             </Button>
-          </div>
+          </Flex>
         }
       </div>
     </Nav>
@@ -57,17 +59,17 @@ const NavSection = () => {
 };
 
 const App = () => {
+  const balanceState = useState(0)
   return (
-
     <Router>
       <div className="h-screen">
         <Suspense fallback="Hello" >
-          <NavSection />
+          <NavSection balanceState={balanceState} />
         </Suspense>
         <Routes>
           <Route path="/" element={
             <Suspense fallback="Loading" >
-              <MainPage />
+              <MainPage setBalance={balanceState[1]} />
             </Suspense>
           } />
           <Route path="*" element={<>Not found</>} />
@@ -102,5 +104,37 @@ const DocsLink = styled.a`
   transition: all 0.2s ease-in-out;
   &:hover {
     color: rgba(255, 255, 255, 1);
+  }
+`;
+
+const Flex = styled.div`
+  width : 100%;
+  display: flex;
+  gap : 12px;
+`
+export const Price = styled.span`
+  flex-wrap : nowrap;
+  padding: 0 18px;
+  border-radius: 4px;
+  background: rgba(255,255,255,0.2);
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 0.9rem;
+  letter-spacing: -0.02em;
+  color: #fff;
+  cursor: pointer;
+  height: 48px;
+  width: 100%;
+  min-width: 92px;
+  transition: all 0.2s ease-in-out;
+  &:hover {
+    background: rgba(255,255,255,0.5);
+  }
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
   }
 `;

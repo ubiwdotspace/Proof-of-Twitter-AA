@@ -1,13 +1,11 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useReducer, useState } from "react";
 // @ts-ignore
 import { useMount, useUpdateEffect } from "react-use";
 import styled from "styled-components";
 import _ from "lodash";
-import { useAccount, useContractWrite, usePrepareContractWrite } from "wagmi";
 import {
   rawEmailToBuffer,
 } from "@zk-email/helpers/dist/input-helpers";
-import { verifyDKIMSignature, DKIMVerificationResult } from "@zk-email/helpers/dist/dkim";
 import {
   downloadProofFiles,
   generateProof,
@@ -26,22 +24,55 @@ import { Col, Row } from "../components/Layout";
 import { NumberedStep } from "../components/NumberedStep";
 import { TopBanner } from "../components/TopBanner";
 import { ProgressBar } from "../components/ProgressBar";
-
+import { useAccountInfo } from "@particle-network/connect-react-ui";
+import { SmartAccount } from '@particle-network/aa';
 import { EthereumSepolia } from "@particle-network/chains";
+import { BigNumberish, Interface } from "ethers";
+import reducer, { SET_ERROR, SET_ETHERUM_SMAADDRESS, SET_LOADING, SET_TX_HASH, SET_EMAIL_FULL, SET_PROOF, SET_PUBLIC_SIGNALS } from "../hooks/store";
+import { EVMProvider } from "@particle-network/connectors";
+import { formatEther } from "ethers";
 
 const CIRCUIT_NAME = "twitter";
 
-export const MainPage: React.FC<{}> = (props) => {
-  const { address } = useAccount();
+interface MyComponentProps {
+  setBalance: React.Dispatch<React.SetStateAction<number>>;
+}
 
-  const [ethereumAddress, setEthereumAddress] = useState<string>("");
-  const [emailFull, setEmailFull] = useState<string>(
-    localStorage.emailFull || ""
-  );
-  const [proof, setProof] = useState<string>(localStorage.proof || "");
-  const [publicSignals, setPublicSignals] = useState<string>(
-    localStorage.publicSignals || ""
-  );
+export const MainPage: React.FC<MyComponentProps> = ({ setBalance }) => {
+  const { particleProvider, account: address
+  } = useAccountInfo()
+
+  const smartAccount = useMemo(() => {
+    return new SmartAccount(particleProvider as EVMProvider, {
+      //@ts-ignore
+      projectId: import.meta.env.VITE_APP_PROJECT_ID,
+      //@ts-ignore
+      clientKey: import.meta.env.VITE_APP_CLIENT_KEY,
+      //@ts-ignore
+      appId: import.meta.env.VITE_APP_APP_ID,
+      aaOptions: {
+        simple: [{
+          chainId: EthereumSepolia.id,
+          version: '1.0.0',
+        }
+        ]
+      }
+    });
+  }, [particleProvider])
+
+
+  const [state, dispatch] = useReducer(reducer, {
+    txHash: '',
+    error: '',
+    loading: false,
+    ethereumSMAAddress: '',
+    emailFull: localStorage.emailFull || "",
+    proof: localStorage.proof || "",
+    publicSignals: localStorage.publicSignals || ""
+  });
+
+  const { txHash, error, loading, emailFull, ethereumSMAAddress, proof, publicSignals } = state;
+
   const [displayMessage, setDisplayMessage] = useState<string>("Prove");
 
   const [verificationMessage, setVerificationMessage] = useState("");
@@ -80,31 +111,28 @@ export const MainPage: React.FC<{}> = (props) => {
   }, []);
 
   useEffect(() => {
-    if (address) {
-      const options = {
-        method: 'POST',
-        headers: {
-          accept: 'application/json',
-          'content-type': 'application/json',
-          authorization: 'Basic YzFiOTM3MjItY2RhYi00ZjUwLWIwM2UtOGE5OTdlZmIzYTJlOmNyUVk2SFVLSTAwRlBpNHV2c0ZZMjVwcXhtMGMzOTBIdWY5aDFWZDI='
-        },
-        body: JSON.stringify({
-          jsonrpc: 2, chainId: EthereumSepolia.id, id: 1, method: 'particle_aa_getSmartAccount', params: [{
-            name: "SIMPLE",
-            version: "1.0.0",
-            ownerAddress: address
-          }]
-        })
-      };
-
-      fetch('https://rpc.particle.network/evm-chain/#particle_aa_getSmartAccount', options)
-        .then(response => response.json())
-        .then(response => setEthereumAddress(response.result[0].smartAccountAddress))
-        .catch(err => console.error(err));
-    } else {
-      setEthereumAddress("");
+    const fetchAccount = async () => {
+      const ethereumSMAAddress = await smartAccount.getAddress()
+      dispatch({ type: SET_ETHERUM_SMAADDRESS, payload: ethereumSMAAddress })
     }
+
+    address && fetchAccount()
   }, [address]);
+
+  useEffect(() => {
+    const fetchBalance = async () => {
+      const balance: BigNumberish = await smartAccount.sendRpc({
+        method: 'eth_getBalance', params: [
+          ethereumSMAAddress,
+          'latest'
+        ]
+      })
+      setBalance(Number(Number(formatEther(balance)).toFixed(6)))
+    }
+
+    ethereumSMAAddress && fetchBalance()
+
+  }, [ethereumSMAAddress, txHash])
 
   const recordTimeForActivity = (activity: string) => {
     setStopwatch((prev) => ({
@@ -128,22 +156,36 @@ export const MainPage: React.FC<{}> = (props) => {
     ].flat();
   };
 
-  const { config } = usePrepareContractWrite({
-    // @ts-ignore
-    address: import.meta.env.VITE_CONTRACT_ADDRESS,
-    abi: abi,
-    functionName: "mint",
-    args: [
-      reformatProofForChain(proof),
-      publicSignals ? JSON.parse(publicSignals) : [],
-    ],
-    enabled: !!(proof && publicSignals),
-    onError: (error: { message: any }) => {
-      console.error(error.message);
-    },
-  });
+  const mintNFT = async () => {
+    if (!(proof && publicSignals)) {
+      return
+    }
 
-  const { data, isLoading, isSuccess, write } = useContractWrite(config);
+    const callData = new Interface(abi).encodeFunctionData("mint", [reformatProofForChain(proof), publicSignals ? JSON.parse(publicSignals) : []])
+
+    const tx = {
+      //@ts-ignore
+      to: import.meta.env.VITE_CONTRACT_ADDRESS,
+      data: callData,
+    }
+
+    dispatch({ type: SET_ERROR, payload: '' });
+    dispatch({ type: SET_LOADING, payload: true });
+
+    try {
+      const feeQuotesResult = await smartAccount.getFeeQuotes(tx);
+      const userOp = feeQuotesResult.verifyingPaymasterNative.userOp;
+      const userOpHash = feeQuotesResult.verifyingPaymasterNative.userOpHash;
+      const txHashResult = await smartAccount.sendUserOperation({ userOp, userOpHash });
+      dispatch({ type: SET_TX_HASH, payload: txHashResult });
+      dispatch({ type: SET_LOADING, payload: false });
+
+    }
+    catch (e: any) {
+      dispatch({ type: SET_ERROR, payload: e?.data?.extraMessage?.message as string || e.message as string });
+      dispatch({ type: SET_LOADING, payload: false });
+    }
+  }
 
   useMount(() => {
     function handleKeyDown() {
@@ -179,7 +221,7 @@ export const MainPage: React.FC<{}> = (props) => {
   const onFileDrop = async (file: File) => {
     if (file.name.endsWith(".eml")) {
       const content = await file.text();
-      setEmailFull(content);
+      dispatch({ type: SET_EMAIL_FULL, payload: content })
     } else {
       alert("Only .eml files are allowed.");
     }
@@ -277,29 +319,34 @@ export const MainPage: React.FC<{}> = (props) => {
             label="Full Email with Headers"
             value={emailFull}
             onChange={(e) => {
-              setEmailFull(e.currentTarget.value);
+              dispatch({ type: SET_EMAIL_FULL, payload: e.currentTarget.value })
             }}
           />
           <SingleLineInput
-            label="Ethereum Smart Account Address"
-            value={ethereumAddress}
-            onChange={(_) => { }}
+            disabled
+            label="Ethereum SMA Address"
+            value={ethereumSMAAddress}
+            onChange={(e) => {
+              // setEthereumAddress(e.currentTarget.value);
+            }}
           />
           <Button
             data-testid="prove-button"
             disabled={
               displayMessage !== "Prove" ||
               emailFull.length === 0 ||
-              ethereumAddress.length === 0
+              ethereumSMAAddress.length === 0
             }
             onClick={async () => {
-              const emailBuffer = rawEmailToBuffer(emailFull);
+              const emailBuffer = rawEmailToBuffer(emailFull); // Cleaned email as buffer
 
               let input: ITwitterCircuitInputs;
               try {
                 setDisplayMessage("Generating proof...");
                 setStatus("generating-input");
-                input = await generateTwitterVerifierCircuitInputs(emailBuffer, ethereumAddress);
+
+                input = await generateTwitterVerifierCircuitInputs(emailBuffer, ethereumSMAAddress);
+
                 console.log("Generated input:", JSON.stringify(input));
               } catch (e) {
                 console.log("Error generating input", e);
@@ -356,13 +403,13 @@ export const MainPage: React.FC<{}> = (props) => {
               console.log("publicSignals", publicSignals);
 
               // alert("Done generating proof");
-              setProof(JSON.stringify(proof));
+              dispatch({ type: SET_PROOF, payload: JSON.stringify(proof) })
               // let kek = publicSignals.map((x: string) => BigInt(x));
               // let soln = packedNBytesToString(kek.slice(0, 12));
               // let soln2 = packedNBytesToString(kek.slice(12, 147));
               // let soln3 = packedNBytesToString(kek.slice(147, 150));
               // setPublicSignals(`From: ${soln}\nTo: ${soln2}\nUsername: ${soln3}`);
-              setPublicSignals(JSON.stringify(publicSignals));
+              dispatch({ type: SET_PUBLIC_SIGNALS, payload: JSON.stringify(publicSignals) })
 
               if (!input) {
                 setStatus("error-failed-to-prove");
@@ -408,18 +455,19 @@ export const MainPage: React.FC<{}> = (props) => {
             disabled
             label="Proof Output"
             value={proof}
-            onChange={(_) => {
-              { }
+            onChange={(e) => {
+              // setProof(e.currentTarget.value);
             }}
             warning={verificationMessage}
             warningColor={verificationPassed ? "green" : "red"}
           />
           <LabeledTextArea
-            label="..."
+            disabled
+            label="Public Signals"
             value={publicSignals}
             secret
-            onChange={(_) => {
-              { }
+            onChange={(e) => {
+              // setPublicSignals(e.currentTarget.value);
             }}
           // warning={
           // }
@@ -450,13 +498,14 @@ export const MainPage: React.FC<{}> = (props) => {
             Verify
           </Button>
           <Button
-            disabled={!verificationPassed || isLoading || isSuccess || !write}
+            disabled={!verificationPassed || !ethereumSMAAddress || loading}
+            // disabled={!verificationPassed || isLoading || isSuccess || !write}
             onClick={async () => {
               setStatus("sending-on-chain");
-              write?.();
+              mintNFT()
             }}
           >
-            {isSuccess
+            {/* {isSuccess
               ? "Successfully sent to chain!"
               : isLoading
                 ? "Confirm in wallet"
@@ -464,16 +513,27 @@ export const MainPage: React.FC<{}> = (props) => {
                   ? "Connect Wallet first, scroll to top!"
                   : verificationPassed
                     ? "Mint Twitter badge on-chain"
-                    : "Verify first, before minting on-chain!"}
+                    : "Verify first, before minting on-chain!"} */}
+            {loading ? "Confirm in Wallet" : !ethereumSMAAddress ? "Connect Wallet first, scroll to top!"
+              : verificationPassed
+                ? "Mint Twitter badge on-chain"
+                : "Verify first, before minting on-chain!"}
           </Button>
-          {isSuccess && (
+          {txHash && (
             <div>
               Transaction:{" "}
-              <a href={"https://sepolia.etherscan.io/tx/" + data?.hash}>
-                {data?.hash}
+              <a href={"https://sepolia.etherscan.io/tx/" + txHash}>
+                {txHash}
               </a>
             </div>
           )}
+
+          {
+            error &&
+            <div style={{ color: 'red' }}>
+              {error}
+            </div>
+          }
         </Column>
       </Main>
     </Container>

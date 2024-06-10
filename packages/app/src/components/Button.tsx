@@ -1,7 +1,8 @@
 import styled from "styled-components";
 
 export const Button = styled.button`
-  padding: 0 14px;
+  flex-wrap: nowrap;
+  padding: 0 18px;
   border-radius: 4px;
   background: #8272e4;
   border: none;
@@ -10,7 +11,6 @@ export const Button = styled.button`
   justify-content: center;
   font-weight: 600;
   font-size: 0.9rem;
-  letter-spacing: -0.02em;
   color: #fff;
   cursor: pointer;
   height: 48px;

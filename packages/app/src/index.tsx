@@ -36,7 +36,7 @@ ReactDOM.render(
           },
         }}
         theme='dark'
-        cacheProvider={false}
+        cacheProvider={true}
       >
         <App />
       </ModalProvider>

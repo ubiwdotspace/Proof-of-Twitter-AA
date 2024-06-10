@@ -131,7 +131,6 @@ export const MainPage: React.FC<MyComponentProps> = ({ setBalance }) => {
     }
 
     ethereumSMAAddress && fetchBalance()
-
   }, [ethereumSMAAddress, txHash])
 
   const recordTimeForActivity = (activity: string) => {

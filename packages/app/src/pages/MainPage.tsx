@@ -134,7 +134,7 @@ export const MainPage: React.FC<MyComponentProps> = ({ setBalance }) => {
   }, [ethereumSMAAddress])
 
   useEffect(() => {
-    const provider = new ethers.JsonRpcProvider('https://mainnet.infura.io/v3/your_infura_project_id');
+    const provider = new ethers.JsonRpcProvider('https://sepolia.infura.io/v3/b2fb2fcbd6e6477f9a2e316aea394a0a');
 
     const filter = {
       address: ethereumSMAAddress

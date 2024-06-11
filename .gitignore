@@ -73,5 +73,3 @@ tsbuildinfo
 **/build
 **/dist
 tsconfig.tsbuildinfo
-
-yarn.lock

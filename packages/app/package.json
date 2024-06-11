@@ -1,5 +1,8 @@
 {
   "name": "@zk-email/twitter-verifier-app",
+  "engines": {
+  "node": ">=18.0.0"
+  },
   "version": "4.0.0",
   "dependencies": {
     "@particle-network/aa": "1.2.0",

@@ -27,7 +27,7 @@ import { ProgressBar } from "../components/ProgressBar";
 import { useAccountInfo } from "@particle-network/connect-react-ui";
 import { SmartAccount } from '@particle-network/aa';
 import { EthereumSepolia } from "@particle-network/chains";
-import { BigNumberish, Interface } from "ethers";
+import { BigNumberish, Interface, ethers } from "ethers";
 import reducer, { SET_ERROR, SET_ETHERUM_SMAADDRESS, SET_LOADING, SET_TX_HASH, SET_EMAIL_FULL, SET_PROOF, SET_PUBLIC_SIGNALS } from "../hooks/store";
 import { EVMProvider } from "@particle-network/connectors";
 import { formatEther } from "ethers";
@@ -119,19 +119,38 @@ export const MainPage: React.FC<MyComponentProps> = ({ setBalance }) => {
     address && fetchAccount()
   }, [address]);
 
-  useEffect(() => {
-    const fetchBalance = async () => {
-      const balance: BigNumberish = await smartAccount.sendRpc({
-        method: 'eth_getBalance', params: [
-          ethereumSMAAddress,
-          'latest'
-        ]
-      })
-      setBalance(Number(Number(formatEther(balance)).toFixed(6)))
-    }
+  const fetchBalance = async () => {
+    const balance: BigNumberish = await smartAccount.sendRpc({
+      method: 'eth_getBalance', params: [
+        ethereumSMAAddress,
+        'latest'
+      ]
+    })
+    setBalance(Number(Number(formatEther(balance)).toFixed(6)))
+  }
 
+  useEffect(() => {
     ethereumSMAAddress && fetchBalance()
-  }, [ethereumSMAAddress, txHash])
+  }, [ethereumSMAAddress])
+
+  useEffect(() => {
+    const provider = new ethers.JsonRpcProvider('https://mainnet.infura.io/v3/your_infura_project_id');
+
+    const filter = {
+      address: ethereumSMAAddress
+    };
+
+    const listener = () => {
+      fetchBalance();
+    };
+
+    ethereumSMAAddress && provider.on(filter, listener);
+
+    return () => {
+      provider.off(filter, listener); // Properly remove the listener
+    };
+  }, [ethereumSMAAddress]);
+
 
   const recordTimeForActivity = (activity: string) => {
     setStopwatch((prev) => ({

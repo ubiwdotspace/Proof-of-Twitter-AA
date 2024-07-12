@@ -134,7 +134,8 @@ export const MainPage: React.FC<MyComponentProps> = ({ setBalance }) => {
   }, [ethereumSMAAddress])
 
   useEffect(() => {
-    const provider = new ethers.JsonRpcProvider('https://sepolia.infura.io/v3/b2fb2fcbd6e6477f9a2e316aea394a0a');
+    //@ts-ignore
+    const provider = new ethers.JsonRpcProvider(import.meta.env.VITE_APP_PUBLIC_RPC);
 
     const filter = {
       address: ethereumSMAAddress
@@ -192,15 +193,14 @@ export const MainPage: React.FC<MyComponentProps> = ({ setBalance }) => {
 
     try {
       const feeQuotesResult = await smartAccount.getFeeQuotes(tx);
-      const userOp = feeQuotesResult.verifyingPaymasterNative.userOp;
-      const userOpHash = feeQuotesResult.verifyingPaymasterNative.userOpHash;
-      const txHashResult = await smartAccount.sendUserOperation({ userOp, userOpHash });
+      const txHashResult = await smartAccount.sendUserOperation(feeQuotesResult.verifyingPaymasterGasless || feeQuotesResult.verifyingPaymasterNative);
       dispatch({ type: SET_TX_HASH, payload: txHashResult });
       dispatch({ type: SET_LOADING, payload: false });
 
     }
     catch (e: any) {
-      dispatch({ type: SET_ERROR, payload: e?.data?.extraMessage?.message as string || e.message as string });
+      const err = JSON.parse(String(e?.data.extraMessage.message).substring(String(e?.data.extraMessage.message).indexOf('{'))) || e?.message || e
+      dispatch({ type: SET_ERROR, payload: typeof err === 'object' ? err.error.message : err });
       dispatch({ type: SET_LOADING, payload: false });
     }
   }
@@ -540,7 +540,7 @@ export const MainPage: React.FC<MyComponentProps> = ({ setBalance }) => {
           {txHash && (
             <div>
               Transaction:{" "}
-              <a href={"https://sepolia.etherscan.io/tx/" + txHash}>
+              <a target="_blank" href={"https://sepolia.etherscan.io/tx/" + txHash}>
                 {txHash}
               </a>
             </div>
@@ -548,7 +548,7 @@ export const MainPage: React.FC<MyComponentProps> = ({ setBalance }) => {
 
           {
             error &&
-            <div style={{ color: 'red' }}>
+            <div style={{ width: '900px', overflow: 'hidden', textOverflow: 'ellipsis', color: 'red' }}>
               {error}
             </div>
           }

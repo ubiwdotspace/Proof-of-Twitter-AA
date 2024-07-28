@@ -253,7 +253,7 @@ export const MainPage: React.FC<MyComponentProps> = ({ setBalance }) => {
         />
       )}
       <div className="title">
-        <Header>Proof of Twitter: ZK Email Demo</Header>
+        <Header>Ubiw.space - Proof of Twitter</Header>
       </div>
 
       <Col
@@ -265,18 +265,18 @@ export const MainPage: React.FC<MyComponentProps> = ({ setBalance }) => {
         }}
       >
         <span style={{ color: "rgba(255, 255, 255, 0.7)" }}>
-          Welcome to a demo page for ZK-Email technology.{" "}
+          Welcome to a page for ZK-Email technology.{" "}
           <a href="https://github.com/zk-email-verify/zk-email-verify/">
             Our library
           </a>{" "}
           will allow you to generate zero knowledge proofs proving you received
           some email and mask out any private data, without trusting our server
-          to keep your privacy. This demo is just one use case that lets you
+          to keep your privacy. This is just one use case that lets you
           prove you own a Twitter username on-chain, by verifying confirmation
           emails (and their normally-hidden headers) from Twitter.
           Visit <a href="https://prove.email/blog/zkemail">our blog</a>{" "}or{" "}
           <a href="https://prove.email">website</a>{" "}to learn more about ZK Email,
-          and find the technical details on how this demo is built{" "}
+          and find the technical details on how this is built{" "}
           <a href="https://prove.email/blog/twitter">here</a>.
           <br />
           <br />

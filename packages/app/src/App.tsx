@@ -30,7 +30,7 @@ const NavSection = ({ balanceState }: { balanceState: any }) => {
   return (
     <Nav>
       <Logo to={"https://prove.email/"}>
-        ZK-Email
+        Ubiw.space - ZK-Email
       </Logo>
       <div
         style={{
